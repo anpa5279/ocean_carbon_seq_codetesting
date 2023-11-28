@@ -6,15 +6,15 @@
 ### rund: Name of the run directory where data are placed
 ### csrc: Directory containing code source
 
-rund=testruns/ncarles_v0l
-csrc=code
+rund=ocean_carbon_seq_codetesting
+csrc=/Users/annapauls/Documents/repository/ocean_carbon_seq_codetesting/code/source
 runo=logfile_test.out
 
 echo '--------------------------------------'
 echo ' Creating Directory and Copying Files '
 echo '--------------------------------------'
 
-rm -rf $rund
+#rm -rf $rund
 mkdir $rund
 mkdir $rund/code
 mkdir $rund/data
