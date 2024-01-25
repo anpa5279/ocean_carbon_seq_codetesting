@@ -1,9 +1,10 @@
 SUBROUTINE suft2(u_level1,it)
+  ! (called in boundary/lower_free) only used if  parameter ifree=1 and then lower.f90 is not used. 
+  !EVERY TASK GETS THEIR OWN FLUXES AND SURFACE SCALARS
 !       u_level1(.,.,1) = u
 !       u_level1(.,.,2) = v
 !       u_level1(.,.,3) = theta
 !       u_level1(.,.,4) = more scalars
-!only used in boundary/lower_free
 
   USE pars
   USE inputs
@@ -14,7 +15,7 @@ SUBROUTINE suft2(u_level1,it)
   REAL :: u_level1(nnx,iys:iye,2+nscl)
 
   tol = 0.01
-  ufree=0.07*(ABS(batag*qstar(1)*dzw(1)))**(1./3.)
+  ufree=0.07*(ABS(batag*qstar(1)*dzw(1)))**(1./3.) !batag= 1*grav/5000 defined in init/init and qstar(1) = wtsfc(1)=hflux  and dzw(1) = z(1) - z(0)
   zeta_mn = -6.0
   zeta_mn_i = 1.0/zeta_mn
   iz   = 1
@@ -26,7 +27,7 @@ SUBROUTINE suft2(u_level1,it)
       t10xy(1) = -qstar(1)/utau*zody*vk74in
       tsfcc(1) = u_level1(ix,iy,3) - t10xy(1)
       vsfc2    = u_level1(ix,iy,1)**2 + u_level1(ix,iy,2)**2
-      vsfc     = SQRT(vsfc2)
+      vsfc     = SQRT(vsfc2) !=sqrt(u^2+v^2)
       windm    = ufree+vsfc
       utausv   = utau
       utau2    = utau*utau
@@ -50,7 +51,7 @@ SUBROUTINE suft2(u_level1,it)
             CALL fzol(zeta_a,phim,phis,psim,psis)
           ENDIF
 
-          utau     = windm*vk/(zody-psim)
+          utau     = windm*vk/(zody-psim) !defined in init/init: vk=0.4 and zody = ALOG(ABS(z1/zo))
           thstar(1)=-qstar(1)/utau
           amonold  = amonin
           amonin   = utau*utau/(batagk*thstar(1))

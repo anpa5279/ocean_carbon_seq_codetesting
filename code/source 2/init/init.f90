@@ -1,5 +1,6 @@
 SUBROUTINE init
-
+!enviroment properties. the context
+!only called in les_mpi line 48 when iti=0 (before the while loop. data comes from random)
   USE pars
   USE inputs
   USE fields
@@ -8,32 +9,32 @@ SUBROUTINE init
 
   pi     = 4.0*ATAN(1.0)
   pi2    = 2.0*pi
-  d_to_r = pi2/360.0
-  grav   = 9.81
-  bfac   = 1.0
+  d_to_r = pi2/360.0 !degrees to radians
+  grav   = 9.81 ! gravity
+  bfac   = 1.0 ! buoyancy factor
 
-  IF(ibuoy==0) bfac = 0.
+  IF(ibuoy==0) bfac = 0. !no buoyancy in the model
 
   ! CASE SPECIFIC DATA
-  rho_a   = 1.0
-  rho_w   = 1000.0
-  t00     = 283.
+  rho_a   = 1.0 !density of air
+  rho_w   = 1000.0 !density of water
+  t00     = 283. !only here to be saved in modules/con_data
   t00b    = 5000.0
-  cp_a    = 1.0057e03
-  cp_w    = 4.20e03
+  cp_a    = 1.0057e03 !pressure coefficient of air
+  cp_w    = 4.20e03 !pressure coefficient of water 
   gcp     = grav/cp_w
   batag   = bfac*grav/t00b
 
   ! SPECIFY STOKES DRIFT PARAMETERS
   cpou10  = 0.6
-  turb_la = 0.3
-  rlat    = 30
+  turb_la = 0.3 !turbulent langmuir number (La_t=sqrt(friction velocity/stokes drift)). Langmuir turbulence occurs when a surface boundary layer is forced by wind in the presence of surface waves.
+  rlat    = 30 !angle of stokes drift 
 
   fcor    = 2.0*pi2*SIN(rlat*d_to_r)/(24.0*3600.0)
   fcor_h  = 0.0
   ugcont  = 0.0
   vgcont  = 0.
-  wtsfc(1) = hflux !-5.0e-7
+  wtsfc(1) = hflux !hflux defined in inputs line 7
   qstar(1) = wtsfc(1)
 
   ! OTHER THERMODYNAMIC VARIABLES FOR HURRICANE TIME VARYING HEAT FLUXES
@@ -68,11 +69,11 @@ SUBROUTINE init
   dtjump  = 0.
   divgls  = 0.
   zo      = 0.0001
-  zi      = -ihb !mixing depth 
+  zi      = -ihb !setting mixing layer
   xl      = 160.0
   yl      = 160.0
   zl      = -96.0
-  izi     = NINT((zi/zl)*nnz) !NINT= rounds to the nearest integer
+  izi     = NINT((zi/zl)*nnz)
 
   ! IF STRETCHED GRID SPECIFY LOCATION OF FIRST POINT
   zw1 = -0.5
@@ -146,15 +147,15 @@ SUBROUTINE init
   zodyin = 1./zody
   wstar  = ABS(batag*zi*wtsfc(1))**(1./3.)
 
-  IF(ismlt == 1) THEN !ismlt   = 1 ; use businger formulas in MO
+  IF(ismlt == 1) THEN
     ! SET CONSTANTS FOR BUSINGER SIMILARITY FUNCTIONS
-    vk74   = vk*0.74 !only used to make vk74in
-    vk74in = 0.74/vk !use in boundary conditions sufto and suft2
+    vk74   = vk*0.74
+    vk74in = 0.74/vk
     zody74 = zody*0.74
-  ELSE !ismlt= 0 ; use large and everyone elses formulas in MO
+  ELSE
     ! SET CONSTANTS FOR LARGE SIMILARITY FUNCTIONS
     vk74    = vk
-    vk74in  = 1.0/vk !use in boundary conditions sufto and suft2
+    vk74in  = 1.0/vk
     zody74  = zody
   ENDIF
 
@@ -162,7 +163,7 @@ SUBROUTINE init
   cdbtm  = vk*vk/zody/zody
 
   ! SET SURFACE FRICTION VELOCITY HERE AND IN SR. SUFTO
-  utau = SQRT(rho_a*(8.5e-4)*ws10*ws10/rho_w)
+  utau = SQRT(rho_a*(8.5e-4)*ws10*ws10/rho_w) ! friction velocity=sqrt(tau_w/rho). tau_w=rho_a*ws10*ws10 (units check). ws10= wind speed
 
   utau2    = utau*utau
   IF(ibuoy == 0 .or. qstar(1) == 0.) THEN
